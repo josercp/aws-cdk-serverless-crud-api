@@ -81,7 +81,7 @@ class AwsCdkServerlessCrudApiStack(Stack):
             description="This service serves tasks."
         )
 
-        # Definir el modelo de validación para POST y PUT
+        # Define API GATEWAY json schema for POST and PUT requests
         task_model = apigateway.Model(
             self, "TaskModel",
             rest_api=api,
