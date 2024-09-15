@@ -9,6 +9,13 @@ table = dynamodb.Table(os.environ['TASKS_TABLE_NAME'])
 
 def handler(event, context):
     try:
+        # Verifying parameter
+        if 'pathParameters' not in event or 'taskId' not in event['pathParameters']:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'taskId is required in pathParameters'})
+            }
+
         task_id = event['pathParameters']['taskId']
 
         # DynamoDB query

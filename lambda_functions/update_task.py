@@ -9,8 +9,39 @@ table = dynamodb.Table(os.environ['TASKS_TABLE_NAME'])
 
 def handler(event, context):
     try:
+        # Verifying parameter
+        if 'pathParameters' not in event or 'taskId' not in event['pathParameters']:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'taskId is required in pathParameters'})
+            }
+
         task_id = event['pathParameters']['taskId']
-        body = json.loads(event['body'])
+
+        # Checking if body exist
+        if 'body' not in event:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Body is required'})
+            }
+
+        # Trying load JSON from body
+        try:
+            body = json.loads(event['body'])
+        except json.JSONDecodeError:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Invalid JSON in request body'})
+            }
+
+        # Verifying body fields
+        required_fields = ['title', 'description', 'status']
+        for field in required_fields:
+            if field not in body:
+                return {
+                    'statusCode': 400,
+                    'body': json.dumps({'error': f'{field} is required in the body'})
+                }
 
         try:
             # Trying update DynamoDB
