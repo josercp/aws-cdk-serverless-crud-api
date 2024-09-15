@@ -36,10 +36,7 @@ def dynamodb_setup():
                 'WriteCapacityUnits': 5
             }
         )
-        # Wait for the table to be created
         table.meta.client.get_waiter('table_exists').wait(TableName='TasksTable')
-
-        # Add a sample item to the table
         table.put_item(Item={'taskId': '123', 'title': 'Sample Task', 'description': 'Sample Description', 'status': 'pending'})
 
         yield
@@ -48,15 +45,12 @@ def dynamodb_setup():
 def test_get_task_success(dynamodb_setup):
     from lambda_functions.get_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '123'
         }
     }
-    context = {}  # Mock context object
-
-    # Call the Lambda function
+    context = {}
     response = handler(event, context)
 
     # Check response
@@ -71,15 +65,13 @@ def test_get_task_success(dynamodb_setup):
 def test_get_task_not_found(dynamodb_setup):
     from lambda_functions.get_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '999'  # ID that does not exist
         }
     }
-    context = {}  # Mock context object
+    context = {}
 
-    # Call the Lambda function
     response = handler(event, context)
 
     # Check response
@@ -91,13 +83,10 @@ def test_get_task_not_found(dynamodb_setup):
 def test_get_task_missing_task_id(dynamodb_setup):
     from lambda_functions.get_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {}
     }
-    context = {}  # Mock context object
-
-    # Call the Lambda function
+    context = {}
     response = handler(event, context)
 
     # Check response

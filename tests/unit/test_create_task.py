@@ -32,8 +32,6 @@ def setup_dynamodb():
         table = dynamodb.Table(os.environ['TASKS_TABLE_NAME'])
         table.meta.client.get_waiter('table_exists').wait(TableName=os.environ['TASKS_TABLE_NAME'])
         yield
-        # Cleanup resources after tests
-        # The mock DynamoDB will be automatically cleaned up by moto
 
 
 @pytest.fixture

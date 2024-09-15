@@ -191,6 +191,17 @@ You can use tools like [curl](https://curl.se/) or [Postman](https://www.postman
   curl -X DELETE https://<api-id>.execute-api.<region>.amazonaws.com/prod/tasks/<taskId>
   ```
 
+
+## Running Unit Tests
+
+To run the unit tests for this project, use the following command:
+
+```bash
+pytest tests/unit/
+```
+
+This will execute all the unit tests located in the `tests/unit/` directory.
+
 ## Clean Up
 
 To destroy the stack and prevent ongoing AWS costs, run:

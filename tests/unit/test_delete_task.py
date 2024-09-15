@@ -3,7 +3,6 @@ import os
 import pytest
 from moto import mock_aws
 import boto3
-from botocore.exceptions import ClientError
 
 
 # Set environment variable
@@ -37,10 +36,7 @@ def dynamodb_setup():
                 'WriteCapacityUnits': 5
             }
         )
-        # Wait for the table to be created
         table.meta.client.get_waiter('table_exists').wait(TableName='TasksTable')
-
-        # Add a sample item to the table
         table.put_item(Item={'taskId': '123', 'description': 'Test task'})
 
         yield
@@ -49,15 +45,12 @@ def dynamodb_setup():
 def test_delete_task_success(dynamodb_setup):
     from lambda_functions.delete_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '123'
         }
     }
-    context = {}  # Mock context object
-
-    # Call the Lambda function
+    context = {}
     response = handler(event, context)
 
     # Check response
@@ -74,15 +67,13 @@ def test_delete_task_success(dynamodb_setup):
 def test_delete_task_not_found(dynamodb_setup):
     from lambda_functions.delete_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': 'non-existent-id'
         }
     }
-    context = {}  # Mock context object
+    context = {}
 
-    # Call the Lambda function
     response = handler(event, context)
 
     # Check response
@@ -93,30 +84,25 @@ def test_delete_task_not_found(dynamodb_setup):
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table('TasksTable')
     result = table.scan()
-    assert len(result['Items']) == 1  # Only the initial item should be present
+    assert len(result['Items']) == 1
 
 
 def test_delete_task_error(dynamodb_setup):
     from lambda_functions.delete_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '123'
         }
     }
-    context = {}  # Mock context object
+    context = {}
 
     # Simulate a DynamoDB error
     with mock_aws():
-        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-        table = dynamodb.Table('TasksTable')
-
         # Simulate table deletion before calling handler
         dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
         dynamodb_client.delete_table(TableName='TasksTable')
 
-        # Call the Lambda function
         response = handler(event, context)
 
         # Check response

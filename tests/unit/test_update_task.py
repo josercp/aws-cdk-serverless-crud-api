@@ -36,10 +36,7 @@ def dynamodb_setup():
                 'WriteCapacityUnits': 5
             }
         )
-        # Wait for the table to be created
         table.meta.client.get_waiter('table_exists').wait(TableName='TasksTable')
-
-        # Add a sample item to the table
         table.put_item(Item={'taskId': '123', 'title': 'Old Title', 'description': 'Old Description', 'status': 'pending'})
 
         yield
@@ -48,7 +45,6 @@ def dynamodb_setup():
 def test_update_task_success(dynamodb_setup):
     from lambda_functions.update_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '123'
@@ -59,9 +55,8 @@ def test_update_task_success(dynamodb_setup):
             'status': 'completed'
         })
     }
-    context = {}  # Mock context object
+    context = {}
 
-    # Call the Lambda function
     response = handler(event, context)
 
     # Check response
@@ -84,7 +79,6 @@ def test_update_task_success(dynamodb_setup):
 def test_update_task_missing_task_id(dynamodb_setup):
     from lambda_functions.update_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {},
         'body': json.dumps({
@@ -93,9 +87,8 @@ def test_update_task_missing_task_id(dynamodb_setup):
             'status': 'completed'
         })
     }
-    context = {}  # Mock context object
+    context = {}
 
-    # Call the Lambda function
     response = handler(event, context)
 
     # Check response
@@ -107,15 +100,13 @@ def test_update_task_missing_task_id(dynamodb_setup):
 def test_update_task_missing_body(dynamodb_setup):
     from lambda_functions.update_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '123'
         }
     }
-    context = {}  # Mock context object
+    context = {}
 
-    # Call the Lambda function
     response = handler(event, context)
 
     # Check response
@@ -127,16 +118,14 @@ def test_update_task_missing_body(dynamodb_setup):
 def test_update_task_invalid_json(dynamodb_setup):
     from lambda_functions.update_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '123'
         },
         'body': 'invalid-json'
     }
-    context = {}  # Mock context object
+    context = {}
 
-    # Call the Lambda function
     response = handler(event, context)
 
     # Check response
@@ -148,7 +137,6 @@ def test_update_task_invalid_json(dynamodb_setup):
 def test_update_task_missing_field(dynamodb_setup):
     from lambda_functions.update_task import handler
 
-    # Sample event for the Lambda function
     event = {
         'pathParameters': {
             'taskId': '123'
@@ -159,9 +147,8 @@ def test_update_task_missing_field(dynamodb_setup):
             # 'status' is missing
         })
     }
-    context = {}  # Mock context object
+    context = {}
 
-    # Call the Lambda function
     response = handler(event, context)
 
     # Check response
